@@ -36,7 +36,7 @@ func (s *APIV1Service) ListAllUserStats(ctx context.Context, _ *v1pb.ListAllUser
 		memoFind.VisibilityList = []store.Visibility{store.Public}
 	} else {
 		if memoFind.CreatorID == nil {
-			internalFilter := fmt.Sprintf(`creator_id == %d || visibility in ["PUBLIC", "Protected"]`, currentUser.ID)
+			internalFilter := fmt.Sprintf(`creator_id == %d || visibility in ["PUBLIC", "PROTECTED"]`, currentUser.ID)
 			if memoFind.Filter != nil {
 				filter := fmt.Sprintf("(%s) && (%s)", *memoFind.Filter, internalFilter)
 				memoFind.Filter = &filter
@@ -87,6 +87,7 @@ func (s *APIV1Service) ListAllUserStats(ctx context.Context, _ *v1pb.ListAllUser
 		if memo.Payload.Property.GetHasIncompleteTasks() {
 			userStats.MemoTypeStats.UndoCount++
 		}
+		userStats.TotalMemoCount++
 	}
 	userStatsList := []*v1pb.UserStats{}
 	for _, userStats := range userStatsMap {
@@ -142,6 +143,7 @@ func (s *APIV1Service) GetUserStats(ctx context.Context, request *v1pb.GetUserSt
 		MemoDisplayTimestamps: []*timestamppb.Timestamp{},
 		MemoTypeStats:         &v1pb.UserStats_MemoTypeStats{},
 		TagCount:              map[string]int32{},
+		TotalMemoCount:        int32(len(memos)),
 	}
 	for _, memo := range memos {
 		displayTs := memo.CreatedTs
