@@ -149,7 +149,14 @@ func convertWorkspaceGeneralSettingFromStore(setting *storepb.WorkspaceGeneralSe
 	if setting == nil {
 		return nil
 	}
+	// Backfill theme if empty
+	theme := setting.Theme
+	if theme == "" {
+		theme = "default"
+	}
+
 	generalSetting := &v1pb.WorkspaceGeneralSetting{
+		Theme:                    theme,
 		DisallowUserRegistration: setting.DisallowUserRegistration,
 		DisallowPasswordAuth:     setting.DisallowPasswordAuth,
 		AdditionalScript:         setting.AdditionalScript,
@@ -175,6 +182,7 @@ func convertWorkspaceGeneralSettingToStore(setting *v1pb.WorkspaceGeneralSetting
 		return nil
 	}
 	generalSetting := &storepb.WorkspaceGeneralSetting{
+		Theme:                    setting.Theme,
 		DisallowUserRegistration: setting.DisallowUserRegistration,
 		DisallowPasswordAuth:     setting.DisallowPasswordAuth,
 		AdditionalScript:         setting.AdditionalScript,

@@ -4,8 +4,8 @@ import { useMemo } from "react";
 import MemoView from "@/components/MemoView";
 import PagedMemoList from "@/components/PagedMemoList";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { viewStore, userStore } from "@/store/v2";
-import memoFilterStore from "@/store/v2/memoFilter";
+import { viewStore, userStore } from "@/store";
+import memoFilterStore from "@/store/memoFilter";
 import { State } from "@/types/proto/api/v1/common";
 import { Memo } from "@/types/proto/api/v1/memo_service";
 
@@ -55,23 +55,25 @@ const Home = observer(() => {
   }, [user, memoFilterStore.filters, viewStore.state.orderByTimeAsc]);
 
   return (
-    <PagedMemoList
-      renderer={(memo: Memo) => <MemoView key={`${memo.name}-${memo.displayTime}`} memo={memo} showVisibility showPinned compact />}
-      listSort={(memos: Memo[]) =>
-        memos
-          .filter((memo) => memo.state === State.NORMAL)
-          .sort((a, b) =>
-            viewStore.state.orderByTimeAsc
-              ? dayjs(a.displayTime).unix() - dayjs(b.displayTime).unix()
-              : dayjs(b.displayTime).unix() - dayjs(a.displayTime).unix(),
-          )
-          .sort((a, b) => Number(b.pinned) - Number(a.pinned))
-      }
-      owner={user.name}
-      orderBy={viewStore.state.orderByTimeAsc ? "display_time asc" : "display_time desc"}
-      filter={selectedShortcut?.filter || ""}
-      oldFilter={memoListFilter}
-    />
+    <div className="w-full min-h-full bg-background text-foreground">
+      <PagedMemoList
+        renderer={(memo: Memo) => <MemoView key={`${memo.name}-${memo.displayTime}`} memo={memo} showVisibility showPinned compact />}
+        listSort={(memos: Memo[]) =>
+          memos
+            .filter((memo) => memo.state === State.NORMAL)
+            .sort((a, b) =>
+              viewStore.state.orderByTimeAsc
+                ? dayjs(a.displayTime).unix() - dayjs(b.displayTime).unix()
+                : dayjs(b.displayTime).unix() - dayjs(a.displayTime).unix(),
+            )
+            .sort((a, b) => Number(b.pinned) - Number(a.pinned))
+        }
+        owner={user.name}
+        orderBy={viewStore.state.orderByTimeAsc ? "display_time asc" : "display_time desc"}
+        filter={selectedShortcut?.filter || ""}
+        oldFilter={memoListFilter}
+      />
+    </div>
   );
 });
 
